@@ -42,6 +42,12 @@ jobs:
         run: |
           sudo systemctl start newrelic-infra
 
+          
+      - name: Check New Relic Agent Status
+        run: |
+          sudo systemctl status newrelic-infra
+  
+
       # Étape 5 : Vérification des logs pour s'assurer que l'agent fonctionne
       - name: Check New Relic Agent Logs
         run: |
