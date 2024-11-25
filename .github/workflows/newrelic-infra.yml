@@ -21,7 +21,7 @@ jobs:
       - name: Generate newrelic-infra.yml
         run: |
           mkdir -p $HOME/newrelic-infra
-          echo "license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}" > $HOME/newrelic-infra/newrelic-infra.yml
+          echo "license_key: aab14277a5bb5696ce2c44f77359a42fFFFFNRAL" > $HOME/newrelic-infra/newrelic-infra.yml
           echo "log:" >> $HOME/newrelic-infra/newrelic-infra.yml
           echo "  file: /var/log/newrelic-infra.log" >> $HOME/newrelic-infra/newrelic-infra.yml
           echo "  level: info" >> $HOME/newrelic-infra/newrelic-infra.yml
@@ -42,7 +42,7 @@ jobs:
         run: |
           sudo systemctl start newrelic-infra
 
-          
+
       - name: Check New Relic Agent Status
         run: |
           sudo systemctl status newrelic-infra
