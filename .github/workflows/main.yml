@@ -48,3 +48,9 @@ jobs:
     with:
       run_codeql: true
 
+  setup_new_relic:
+    needs: docker_build_test
+    uses: ./.github/workflows/newrelic-infra.yml
+    with:
+      python-version: "3.12"
+
