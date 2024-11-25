@@ -21,11 +21,36 @@ jobs:
           python-version: ${{ inputs.python-version }}
       
       - name: Install uv
-        run: pip install uv
+        run: |
+          pip install uv
+          pip install newrelic
 
       - name: Install dependencies and create venv
         run: uv sync
 
+
+      # Étape 4 : Initialiser New Relic (sans démarrer l'application)
+      - name: Initialize New Relic
+        run: |
+          python -c "
+          import newrelic.agent;
+          newrelic.agent.initialize('newrelic.ini');
+          print('New Relic monitoring initialized!')
+          "
+
+      - name: Install New Relic
+        run: |
+          pip install newrelic
+          newrelic-admin generate-config ${{ secrets.NEW_RELIC_LICENSE_KEY }} newrelic.ini
+
+      - name: Install dependencies
+        run: pip freeze > requirements.txt
+        
+        
+      - name: Run application with New Relic
+        run: NEW_RELIC_CONFIG_FILE=newrelic.ini newrelic-admin run-program python app.py
+
+      
       - name: Install Flake8 explicitly
         run: pip install flake8
 
