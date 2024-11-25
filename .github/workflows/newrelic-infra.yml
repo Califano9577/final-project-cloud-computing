@@ -1,0 +1,48 @@
+name: Setup New Relic Infrastructure
+
+on:
+  # Déclenchement lors des push ou pull requests vers la branche main
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+
+jobs:
+  setup_new_relic:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1 : Vérifiez le code source
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2 : Configurez le fichier newrelic-infra.yml
+      - name: Generate newrelic-infra.yml
+        run: |
+          mkdir -p $HOME/newrelic-infra
+          echo "license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}" > $HOME/newrelic-infra/newrelic-infra.yml
+          echo "log:" >> $HOME/newrelic-infra/newrelic-infra.yml
+          echo "  file: /var/log/newrelic-infra.log" >> $HOME/newrelic-infra/newrelic-infra.yml
+          echo "  level: info" >> $HOME/newrelic-infra/newrelic-infra.yml
+          echo "custom_attributes:" >> $HOME/newrelic-infra/newrelic-infra.yml
+          echo "  environment: production" >> $HOME/newrelic-infra/newrelic-infra.yml
+          echo "  project: final-project-cloud-computing" >> $HOME/newrelic-infra/newrelic-infra.yml
+
+      # Étape 3 : Installer New Relic Infrastructure (exemple pour Ubuntu)
+      - name: Install New Relic Infrastructure Agent
+        run: |
+          curl -Ls https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg | sudo gpg --dearmor -o /usr/share/keyrings/newrelic-infra-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/newrelic-infra-archive-keyring.gpg] https://download.newrelic.com/infrastructure_agent/linux/apt focal main" | sudo tee /etc/apt/sources.list.d/newrelic-infra.list
+          sudo apt-get update
+          sudo apt-get install -y newrelic-infra
+
+      # Étape 4 : Démarrer l'agent New Relic
+      - name: Start New Relic Infrastructure Agent
+        run: |
+          sudo systemctl start newrelic-infra
+
+      # Étape 5 : Vérification des logs pour s'assurer que l'agent fonctionne
+      - name: Check New Relic Agent Logs
+        run: |
+          sudo cat /var/log/newrelic-infra.log
